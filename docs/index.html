@@ -44,12 +44,23 @@
     }
     #login-box button:hover { background: #2563eb; }
     #error { color: red; margin-top: 0.5rem; font-size: 0.9rem; }
-    #content {
-      display: none;
-      text-align: center;
+
+    #content { display: none; width: 100%; max-width: 800px; padding: 2rem; box-sizing: border-box; }
+    #content h1 { text-align: center; color: #3b82f6; margin-bottom: 0.25rem; }
+    #content .subtitle { text-align: center; color: #888; margin-bottom: 2rem; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     }
-    #content h1 { font-size: 2rem; color: #3b82f6; }
-    #content p { font-size: 1.2rem; color: #555; }
+    thead { background: #3b82f6; color: white; }
+    th, td { padding: 0.9rem 1.2rem; text-align: left; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+    tbody tr:hover { background: #eff6ff; }
   </style>
 </head>
 <body>
@@ -63,11 +74,43 @@
   </div>
 
   <div id="content">
-    <h1>🎉 Welcome, Family!</h1>
-    <p>You're in. Vacation planning coming soon...</p>
+    <h1>🌴 Family Vacation Planner</h1>
+    <p class="subtitle">Our shortlist of destinations</p>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Destination</th>
+          <th>Country</th>
+        </tr>
+      </thead>
+      <tbody id="destinations-body"></tbody>
+    </table>
   </div>
 
   <script>
+    // ── Edit this list to add/remove destinations ──────────────────────────
+    const DESTINATIONS = [
+      { name: "Amalfi Coast",   country: "Italy"  },
+      { name: "Greece",         country: "Greece" },
+      { name: "Sevilla",        country: "Spain"  },
+      { name: "Florence",       country: "Italy"  },
+      { name: "Cannes",         country: "France" },
+      { name: "Finland",        country: "Finland"},
+    ];
+    // ───────────────────────────────────────────────────────────────────────
+
+    function renderDestinations() {
+      const tbody = document.getElementById("destinations-body");
+      tbody.innerHTML = DESTINATIONS.map((d, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${d.name}</td>
+          <td>${d.country}</td>
+        </tr>
+      `).join("");
+    }
+
     async function login() {
       const password = document.getElementById("password-input").value;
       const errorEl = document.getElementById("error");
@@ -84,6 +127,7 @@
         if (data.success) {
           document.getElementById("login-box").style.display = "none";
           document.getElementById("content").style.display = "block";
+          renderDestinations();
         } else {
           errorEl.textContent = "Wrong password. Try again.";
         }
