@@ -1,8 +1,101 @@
 <!DOCTYPE html>
-<html>
-  <head><title>Family Vacation Planner</title></head>
-  <body>
-    <h1>Family Vacation Planner 🌴</h1>
-    <p>Coming soon...</p>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Vacation Planner</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f0f4f8;
+    }
+    #login-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+    #login-box h2 { margin-bottom: 1rem; }
+    #login-box input {
+      width: 100%;
+      padding: 0.6rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+      margin-bottom: 1rem;
+    }
+    #login-box button {
+      width: 100%;
+      padding: 0.7rem;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #login-box button:hover { background: #2563eb; }
+    #error { color: red; margin-top: 0.5rem; font-size: 0.9rem; }
+    #content {
+      display: none;
+      text-align: center;
+    }
+    #content h1 { font-size: 2rem; color: #3b82f6; }
+    #content p { font-size: 1.2rem; color: #555; }
+  </style>
+</head>
+<body>
+
+  <div id="login-box">
+    <h2>🌴 Family Vacation Planner</h2>
+    <p>Enter the family password to continue</p>
+    <input type="password" id="password-input" placeholder="Password" />
+    <button onclick="login()">Enter</button>
+    <div id="error"></div>
+  </div>
+
+  <div id="content">
+    <h1>🎉 Welcome, Family!</h1>
+    <p>You're in. Vacation planning coming soon...</p>
+  </div>
+
+  <script>
+    async function login() {
+      const password = document.getElementById("password-input").value;
+      const errorEl = document.getElementById("error");
+      errorEl.textContent = "";
+
+      try {
+        const res = await fetch("https://vacation-auth.floydian27.workers.dev/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          document.getElementById("login-box").style.display = "none";
+          document.getElementById("content").style.display = "block";
+        } else {
+          errorEl.textContent = "Wrong password. Try again.";
+        }
+      } catch (e) {
+        errorEl.textContent = "Something went wrong. Please try again.";
+      }
+    }
+
+    document.getElementById("password-input").addEventListener("keydown", e => {
+      if (e.key === "Enter") login();
+    });
+  </script>
+
+</body>
 </html>
