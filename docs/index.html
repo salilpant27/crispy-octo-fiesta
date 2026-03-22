@@ -48,6 +48,7 @@
     #content { display: none; width: 100%; max-width: 900px; padding: 2rem; box-sizing: border-box; }
     #content h1 { text-align: center; color: #3b82f6; margin-bottom: 0.25rem; }
     #content .subtitle { text-align: center; color: #888; margin-bottom: 1.5rem; }
+
     .dates-banner {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -60,6 +61,30 @@
     }
     .dates-banner strong { font-size: 1.1rem; }
 
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .tab-btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      background: none;
+      font-size: 1rem;
+      cursor: pointer;
+      color: #64748b;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      border-radius: 4px 4px 0 0;
+    }
+    .tab-btn:hover { color: #3b82f6; }
+    .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; font-weight: 600; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Destinations table */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -84,10 +109,7 @@
       white-space: nowrap;
       text-decoration: none;
     }
-    .tag:hover {
-      background: #dbeafe;
-      border-color: #3b82f6;
-    }
+    .tag:hover { background: #dbeafe; border-color: #3b82f6; }
 
     .vote-cell { display: flex; align-items: center; gap: 0.5rem; }
     .vote-btn {
@@ -112,6 +134,94 @@
       color: #1d4ed8;
     }
     .vote-count.negative { color: #ef4444; }
+
+    /* Research tab */
+    .research-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+    .research-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .research-card-header {
+      background: #3b82f6;
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .research-card-header h2 { margin: 0; font-size: 1.2rem; }
+    .research-card-header .flag { font-size: 1.5rem; }
+    .research-card-body { padding: 1.5rem; }
+
+    .research-section { margin-bottom: 1.5rem; }
+    .research-section:last-child { margin-bottom: 0; }
+    .research-section h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin: 0 0 0.75rem 0;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+    }
+    .info-item {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 0.6rem 0.9rem;
+    }
+    .info-item .label { font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.2rem; }
+    .info-item .value { font-size: 0.95rem; font-weight: 500; color: #1e293b; }
+
+    .research-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .research-list li {
+      padding: 0.5rem 0.75rem;
+      background: #f8fafc;
+      border-radius: 6px;
+      font-size: 0.92rem;
+      color: #334155;
+    }
+    .research-list li::before { content: "→ "; color: #3b82f6; font-weight: 600; }
+
+    .cost-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    .cost-table th { text-align: left; padding: 0.5rem 0.75rem; background: #f1f5f9; color: #475569; font-weight: 600; }
+    .cost-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid #f1f5f9; color: #334155; }
+    .cost-table tr:last-child td { border-bottom: none; }
+
+    .itinerary { display: flex; flex-direction: column; gap: 0.5rem; }
+    .itinerary-day {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 0.75rem;
+      align-items: start;
+    }
+    .itinerary-day .day-label {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border-radius: 6px;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .itinerary-day .day-desc { font-size: 0.92rem; color: #334155; padding-top: 0.3rem; }
   </style>
 </head>
 <body>
@@ -130,23 +240,176 @@
     <div class="dates-banner">
       📅 Travel window: <strong>July 13 – July 26, 2026</strong>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Destination</th>
-          <th>Country</th>
-          <th>Things to Do</th>
-          <th>Votes</th>
-        </tr>
-      </thead>
-      <tbody id="destinations-body"></tbody>
-    </table>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('destinations')">Destinations</button>
+      <button class="tab-btn" onclick="showTab('research')">Research</button>
+    </div>
+
+    <div id="tab-destinations" class="tab-panel active">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Destination</th>
+            <th>Country</th>
+            <th>Things to Do</th>
+            <th>Votes</th>
+          </tr>
+        </thead>
+        <tbody id="destinations-body"></tbody>
+      </table>
+    </div>
+
+    <div id="tab-research" class="tab-panel">
+      <div class="research-grid">
+
+        <!-- Ireland -->
+        <div class="research-card">
+          <div class="research-card-header">
+            <span class="flag">🇮🇪</span>
+            <h2>Dublin / Killarney — Ireland</h2>
+          </div>
+          <div class="research-card-body">
+
+            <div class="research-section">
+              <h3>Getting There</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="label">Fly into</div>
+                  <div class="value">Dublin Airport (DUB)</div>
+                </div>
+                <div class="info-item">
+                  <div class="label">Dublin → Killarney</div>
+                  <div class="value">~3 hrs by car / minibus</div>
+                </div>
+                <div class="info-item">
+                  <div class="label">Group transport</div>
+                  <div class="value">16-seater private minibus (essential for 15)</div>
+                </div>
+                <div class="info-item">
+                  <div class="label">Train option</div>
+                  <div class="value">Irish Rail, Heuston → Killarney (~3.5 hrs)</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="research-section">
+              <h3>Base: Killarney (recommended for our group)</h3>
+              <ul class="research-list">
+                <li>Walkable town center with pubs, restaurants, live trad music nightly</li>
+                <li>Right on the edge of Killarney National Park</li>
+                <li>Jaunting cars (horse-drawn carriages) through the park — accessible for all ages</li>
+                <li>Ring of Kerry scenic drive starts at the doorstep — no hiking needed, do by minibus</li>
+                <li>Muckross House &amp; Gardens — easy walk, historic estate</li>
+              </ul>
+            </div>
+
+            <div class="research-section">
+              <h3>Things to Do</h3>
+              <ul class="research-list">
+                <li>Killarney National Park — jaunting car tour (accessible for 85+)</li>
+                <li>Cliffs of Moher — 2 hr drive, massive wow factor; book timed entry in advance</li>
+                <li>Ring of Kerry — full day scenic drive by minibus</li>
+                <li>Muckross House &amp; Gardens — historic estate, easy walking</li>
+                <li>Doolin village — legendary trad music pub sessions (pair with Cliffs day trip)</li>
+                <li>Galway city day trip — food, pubs, street life (~2 hrs from Killarney)</li>
+              </ul>
+            </div>
+
+            <div class="research-section">
+              <h3>Where to Stay (Large Houses — to verify)</h3>
+              <ul class="research-list">
+                <li>Coolclogher House — historic manor, sleeps 14–16, close to town center</li>
+                <li>Ethan House — multiple suites on one site, good for family sub-groups</li>
+                <li>Browse: bighouseexperience.com · groupaccommodation.com · dreamireland.com</li>
+              </ul>
+            </div>
+
+            <div class="research-section">
+              <h3>Estimated Costs</h3>
+              <table class="cost-table">
+                <thead>
+                  <tr><th>Item</th><th>Estimate</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Large house rental (14–16 people)</td><td>€5,000–€10,000/week</td><td>Peak July pricing</td></tr>
+                  <tr><td>Per person accommodation</td><td>~€400–€700/person</td><td>Split 15 ways</td></tr>
+                  <tr><td>16-seater minibus rental</td><td>~€1,500–€2,500/week</td><td>From Dublin airport</td></tr>
+                  <tr><td>Cliffs of Moher entry</td><td>~€9/adult</td><td>Book timed entry online</td></tr>
+                  <tr><td>Jaunting car (Killarney NP)</td><td>~€20–€30/person</td><td>Group rates available</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="research-section">
+              <h3>Sample Itinerary (Sat–Sat)</h3>
+              <div class="itinerary">
+                <div class="itinerary-day">
+                  <div class="day-label">Day 1 · Sat</div>
+                  <div class="day-desc">Fly into Dublin, pick up minibus, drive to Killarney (~3 hrs), settle in, dinner out</div>
+                </div>
+                <div class="itinerary-day">
+                  <div class="day-label">Day 2 · Sun</div>
+                  <div class="day-desc">Killarney National Park by jaunting car, Muckross House, pub dinner in town</div>
+                </div>
+                <div class="itinerary-day">
+                  <div class="day-label">Day 3 · Mon</div>
+                  <div class="day-desc">Ring of Kerry full-day scenic drive by minibus</div>
+                </div>
+                <div class="itinerary-day">
+                  <div class="day-label">Day 4 · Tue</div>
+                  <div class="day-desc">Free day — town walks, local restaurants, afternoon pubs</div>
+                </div>
+                <div class="itinerary-day">
+                  <div class="day-label">Day 5 · Wed</div>
+                  <div class="day-desc">Day trip to Cliffs of Moher (book timed entry) + Doolin for trad music dinner</div>
+                </div>
+                <div class="itinerary-day">
+                  <div class="day-label">Day 6 · Thu</div>
+                  <div class="day-desc">Optional Galway city day trip, or leisure in Killarney</div>
+                </div>
+                <div class="itinerary-day">
+                  <div class="day-label">Day 7 · Fri</div>
+                  <div class="day-desc">Farewell family dinner, final pub night</div>
+                </div>
+                <div class="itinerary-day">
+                  <div class="day-label">Day 8 · Sat</div>
+                  <div class="day-desc">Drive back to Dublin, fly home</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="research-section">
+              <h3>Tips</h3>
+              <ul class="research-list">
+                <li>Book the house ASAP — July 2026 large houses are filling up now</li>
+                <li>Drive on the left; rural roads are narrow — minibus driver needs to be confident</li>
+                <li>July weather: ~60–65°F, intermittent rain — pack waterproof layers</li>
+                <li>Do a big grocery shop on arrival day; supermarkets thin out in rural areas</li>
+                <li>Euros only (Republic of Ireland); Northern Ireland uses GBP</li>
+              </ul>
+            </div>
+
+          </div>
+        </div>
+        <!-- end Ireland card -->
+
+      </div>
+    </div>
+
   </div>
 
   <script>
     const WORKER = "https://vacation-auth.floydian27.workers.dev";
     let sessionPassword = "";
+
+    function showTab(name) {
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("tab-" + name).classList.add("active");
+      event.target.classList.add("active");
+    }
 
     function renderDestinations(destinations, votes) {
       const tbody = document.getElementById("destinations-body");
@@ -205,7 +468,6 @@
         });
         const data = await res.json();
         if (data.success) {
-          // Update all vote counts from fresh server state
           const tbody = document.getElementById("destinations-body");
           const rows = tbody.querySelectorAll("tr");
           rows.forEach((row, i) => {
