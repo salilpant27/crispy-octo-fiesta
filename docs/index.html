@@ -82,6 +82,11 @@
       padding: 0.15rem 0.55rem;
       font-size: 0.78rem;
       white-space: nowrap;
+      text-decoration: none;
+    }
+    .tag:hover {
+      background: #dbeafe;
+      border-color: #3b82f6;
     }
 
     .vote-cell { display: flex; align-items: center; gap: 0.5rem; }
@@ -152,7 +157,7 @@
             <td>${i + 1}</td>
             <td>${d.name}</td>
             <td>${d.country}</td>
-            <td><div class="tags">${d.things.map(t => `<span class="tag">${t}</span>`).join("")}</div></td>
+            <td><div class="tags">${d.things.map(t => `<a class="tag" href="https://www.google.com/maps/search/${encodeURIComponent(d.name + ' ' + t)}" target="_blank" rel="noopener">${t}</a>`).join("")}</div></td>
             <td>
               <div class="vote-cell">
                 <button class="vote-btn" onclick="vote('${d.name}', 'up')">👍</button>
