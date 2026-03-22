@@ -45,7 +45,7 @@
     #login-box button:hover { background: #2563eb; }
     #error { color: red; margin-top: 0.5rem; font-size: 0.9rem; }
 
-    #content { display: none; width: 100%; max-width: 800px; padding: 2rem; box-sizing: border-box; }
+    #content { display: none; width: 100%; max-width: 900px; padding: 2rem; box-sizing: border-box; }
     #content h1 { text-align: center; color: #3b82f6; margin-bottom: 0.25rem; }
     #content .subtitle { text-align: center; color: #888; margin-bottom: 1.5rem; }
     .dates-banner {
@@ -69,9 +69,44 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     }
     thead { background: #3b82f6; color: white; }
-    th, td { padding: 0.9rem 1.2rem; text-align: left; }
+    th, td { padding: 0.9rem 1.2rem; text-align: left; vertical-align: middle; }
     tbody tr:nth-child(even) { background: #f8fafc; }
     tbody tr:hover { background: #eff6ff; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+    .tag {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 20px;
+      padding: 0.15rem 0.55rem;
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+
+    .vote-cell { display: flex; align-items: center; gap: 0.5rem; }
+    .vote-btn {
+      background: none;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .vote-btn:hover { background: #eff6ff; border-color: #3b82f6; }
+    .vote-count {
+      font-weight: 600;
+      font-size: 1rem;
+      min-width: 24px;
+      text-align: center;
+      color: #1d4ed8;
+    }
+    .vote-count.negative { color: #ef4444; }
   </style>
 </head>
 <body>
@@ -96,6 +131,8 @@
           <th>#</th>
           <th>Destination</th>
           <th>Country</th>
+          <th>Things to Do</th>
+          <th>Votes</th>
         </tr>
       </thead>
       <tbody id="destinations-body"></tbody>
@@ -103,26 +140,29 @@
   </div>
 
   <script>
-    // ── Edit this list to add/remove destinations ──────────────────────────
-    const DESTINATIONS = [
-      { name: "Amalfi Coast",   country: "Italy"  },
-      { name: "Greece",         country: "Greece" },
-      { name: "Sevilla",        country: "Spain"  },
-      { name: "Florence",       country: "Italy"  },
-      { name: "Cannes",         country: "France" },
-      { name: "Finland",        country: "Finland"},
-    ];
-    // ───────────────────────────────────────────────────────────────────────
+    const WORKER = "https://vacation-auth.floydian27.workers.dev";
+    let sessionPassword = "";
 
-    function renderDestinations() {
+    function renderDestinations(destinations, votes) {
       const tbody = document.getElementById("destinations-body");
-      tbody.innerHTML = DESTINATIONS.map((d, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${d.name}</td>
-          <td>${d.country}</td>
-        </tr>
-      `).join("");
+      tbody.innerHTML = destinations.map((d, i) => {
+        const count = votes[d.name] || 0;
+        return `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${d.name}</td>
+            <td>${d.country}</td>
+            <td><div class="tags">${d.things.map(t => `<span class="tag">${t}</span>`).join("")}</div></td>
+            <td>
+              <div class="vote-cell">
+                <button class="vote-btn" onclick="vote('${d.name}', 'up')">👍</button>
+                <span class="vote-count ${count < 0 ? 'negative' : ''}" id="vote-${i}">${count}</span>
+                <button class="vote-btn" onclick="vote('${d.name}', 'down')">👎</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
     }
 
     async function login() {
@@ -131,7 +171,7 @@
       errorEl.textContent = "";
 
       try {
-        const res = await fetch("https://vacation-auth.floydian27.workers.dev/", {
+        const res = await fetch(WORKER, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ password })
@@ -139,14 +179,42 @@
         const data = await res.json();
 
         if (data.success) {
+          sessionPassword = password;
           document.getElementById("login-box").style.display = "none";
           document.getElementById("content").style.display = "block";
-          renderDestinations();
+          renderDestinations(data.destinations, data.votes);
         } else {
           errorEl.textContent = "Wrong password. Try again.";
         }
       } catch (e) {
         errorEl.textContent = "Something went wrong. Please try again.";
+      }
+    }
+
+    async function vote(destination, direction) {
+      try {
+        const res = await fetch(`${WORKER}/vote`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: sessionPassword, destination, direction })
+        });
+        const data = await res.json();
+        if (data.success) {
+          // Update all vote counts from fresh server state
+          const tbody = document.getElementById("destinations-body");
+          const rows = tbody.querySelectorAll("tr");
+          rows.forEach((row, i) => {
+            const nameCell = row.cells[1].textContent;
+            const countEl = row.querySelector(".vote-count");
+            if (countEl && data.votes[nameCell] !== undefined) {
+              const count = data.votes[nameCell];
+              countEl.textContent = count;
+              countEl.className = "vote-count" + (count < 0 ? " negative" : "");
+            }
+          });
+        }
+      } catch (e) {
+        console.error("Vote failed", e);
       }
     }
 
