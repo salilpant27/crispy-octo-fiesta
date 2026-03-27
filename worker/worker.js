@@ -1,15 +1,3 @@
-const DESTINATIONS = [
-  { name: "Amalfi Coast", country: "Italy",   things: ["Boat tour", "Hiking", "Swimming", "Limoncello", "Positano"] },
-  { name: "Greece",       country: "Greece",  things: ["Island hop", "Acropolis", "Sailing", "Beach", "Wine tasting"] },
-  { name: "Sevilla",      country: "Spain",   things: ["Flamenco", "Tapas", "Alcázar", "Cathedral", "Markets"] },
-  { name: "Florence",     country: "Italy",   things: ["Uffizi", "Duomo", "Gelato", "The David", "Wine"] },
-  { name: "Cannes",       country: "France",  things: ["Beach", "Monaco day trip", "Yacht", "Markets", "Nice"] },
-  { name: "Finland",      country: "Finland", things: ["Sauna", "Kayaking", "Midnight sun", "Hiking", "Reindeer"] },
-  { name: "Dublin",       country: "Ireland", things: ["Guinness", "Cliffs of Moher", "Pub crawl", "Kilkenny", "Galway"] },
-  { name: "Castiglione della Pescaia", country: "Italy", things: ["Blue Flag beaches", "Pisa day trip", "Florence day trip", "Seafood", "Giannutri island"] },
-  { name: "Liguria / Italian Riviera", country: "Italy", things: ["Cinque Terre", "Portofino", "Genoa", "Milan day trip", "San Fruttuoso"] },
-];
-
 const CORS = {
   "Access-Control-Allow-Origin": "https://salilpant27.github.io",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -32,9 +20,13 @@ export default {
 
     if (url.pathname === "/") {
       if (body.password !== env.PASSWORD) return json({ success: false });
-      const raw = await env.VOTES.get("votes");
-      const votes = raw ? JSON.parse(raw) : {};
-      return json({ success: true, destinations: DESTINATIONS, votes });
+      const [rawVotes, rawDest] = await Promise.all([
+        env.VOTES.get("votes"),
+        env.VOTES.get("destinations"),
+      ]);
+      const votes = rawVotes ? JSON.parse(rawVotes) : {};
+      const destinations = rawDest ? JSON.parse(rawDest) : [];
+      return json({ success: true, destinations, votes });
     }
 
     if (url.pathname === "/vote") {
