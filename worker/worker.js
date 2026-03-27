@@ -7,6 +7,7 @@ const DESTINATIONS = [
   { name: "Finland",      country: "Finland", things: ["Sauna", "Kayaking", "Midnight sun", "Hiking", "Reindeer"] },
   { name: "Dublin",       country: "Ireland", things: ["Guinness", "Cliffs of Moher", "Pub crawl", "Kilkenny", "Galway"] },
   { name: "Castiglione della Pescaia", country: "Italy", things: ["Blue Flag beaches", "Pisa day trip", "Florence day trip", "Seafood", "Giannutri island"] },
+  { name: "Liguria / Italian Riviera", country: "Italy", things: ["Cinque Terre", "Portofino", "Genoa", "Milan day trip", "San Fruttuoso"] },
 ];
 
 const CORS = {
