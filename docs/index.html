@@ -222,6 +222,31 @@
       text-align: center;
     }
     .itinerary-day .day-desc { font-size: 0.92rem; color: #334155; padding-top: 0.3rem; }
+
+    /* Research sub-tabs */
+    .sub-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .sub-tab-btn {
+      padding: 0.4rem 0.9rem;
+      border: 1px solid #e2e8f0;
+      background: white;
+      font-size: 0.88rem;
+      cursor: pointer;
+      color: #64748b;
+      border-radius: 20px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .sub-tab-btn:hover { background: #eff6ff; color: #3b82f6; border-color: #bfdbfe; }
+    .sub-tab-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; font-weight: 600; }
+    .research-tab-panel { display: none; }
+    .research-tab-panel.active { display: block; }
   </style>
 </head>
 <body>
@@ -262,6 +287,20 @@
     </div>
 
     <div id="tab-research" class="tab-panel">
+      <div class="sub-tabs" id="research-sub-tabs">
+        <button class="sub-tab-btn active" onclick="showResearchTab('hotels')">🏠 Hotels</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('ireland')">🇮🇪 Ireland</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('sorrento')">🇮🇹 Sorrento</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('seville')">🇪🇸 Seville</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('florence')">🇮🇹 Florence</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('castiglione')">🇮🇹 Castiglione</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('helsinki')">🇫🇮 Helsinki</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('liguria')">🇮🇹 Liguria</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('athens')">🇬🇷 Athens</button>
+        <button class="sub-tab-btn" onclick="showResearchTab('malaga')">🇪🇸 Malaga</button>
+      </div>
+
+      <div id="rtab-hotels" class="research-tab-panel active">
       <div class="research-grid">
 
         <!-- Accommodation Comparison -->
@@ -323,6 +362,11 @@
           </div>
         </div>
         <!-- end Accommodation Comparison -->
+
+      </div></div><!-- end hotels panel -->
+
+      <div id="rtab-ireland" class="research-tab-panel">
+      <div class="research-grid">
 
         <!-- Ireland -->
         <div class="research-card">
@@ -552,6 +596,11 @@
         </div>
         <!-- end Dublin as Base card -->
 
+      </div></div><!-- end ireland panel -->
+
+      <div id="rtab-sorrento" class="research-tab-panel">
+      <div class="research-grid">
+
         <!-- Sorrento / Amalfi Coast -->
         <div class="research-card">
           <div class="research-card-header">
@@ -645,6 +694,11 @@
           </div>
         </div>
 
+      </div></div><!-- end sorrento panel -->
+
+      <div id="rtab-seville" class="research-tab-panel">
+      <div class="research-grid">
+
         <!-- Seville -->
         <div class="research-card">
           <div class="research-card-header">
@@ -708,6 +762,11 @@
             </div>
           </div>
         </div>
+
+      </div></div><!-- end seville panel -->
+
+      <div id="rtab-florence" class="research-tab-panel">
+      <div class="research-grid">
 
         <!-- Florence -->
         <div class="research-card">
@@ -773,6 +832,11 @@
             </div>
           </div>
         </div>
+
+      </div></div><!-- end florence panel -->
+
+      <div id="rtab-castiglione" class="research-tab-panel">
+      <div class="research-grid">
 
         <!-- Castiglione della Pescaia -->
         <div class="research-card">
@@ -1026,6 +1090,11 @@
         </div>
         <!-- end Castiglione della Pescaia card -->
 
+      </div></div><!-- end castiglione panel -->
+
+      <div id="rtab-helsinki" class="research-tab-panel">
+      <div class="research-grid">
+
         <!-- Helsinki -->
         <div class="research-card">
           <div class="research-card-header">
@@ -1089,6 +1158,11 @@
             </div>
           </div>
         </div>
+
+      </div></div><!-- end helsinki panel -->
+
+      <div id="rtab-liguria" class="research-tab-panel">
+      <div class="research-grid">
 
         <!-- Liguria / Italian Riviera -->
         <div class="research-card">
@@ -1317,6 +1391,11 @@
         </div>
         <!-- end Liguria card -->
 
+      </div></div><!-- end liguria panel -->
+
+      <div id="rtab-athens" class="research-tab-panel">
+      <div class="research-grid">
+
         <!-- Athens Riviera -->
         <div class="research-card">
           <div class="research-card-header">
@@ -1412,6 +1491,11 @@
         </div>
         <!-- end Athens Riviera card -->
 
+      </div></div><!-- end athens panel -->
+
+      <div id="rtab-malaga" class="research-tab-panel">
+      <div class="research-grid">
+
         <!-- Malaga / Costa del Sol -->
         <div class="research-card">
           <div class="research-card-header">
@@ -1503,7 +1587,7 @@
         </div>
         <!-- end Malaga card -->
 
-      </div>
+      </div></div><!-- end malaga panel -->
     </div>
 
   </div>
@@ -1516,6 +1600,13 @@
       document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
       document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
       document.getElementById("tab-" + name).classList.add("active");
+      event.target.classList.add("active");
+    }
+
+    function showResearchTab(name) {
+      document.querySelectorAll(".research-tab-panel").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".sub-tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("rtab-" + name).classList.add("active");
       event.target.classList.add("active");
     }
 
